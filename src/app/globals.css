@@ -1,25 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: Rubik;
-  font-style: normal;
-  src: url("./assets/fonts/Rubik-VariableFont_wght.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Rubik Italic";
-  font-style: italic;
-  src: url("./assets/fonts/Rubik-Italic-VariableFont_wght.ttf")
-    format("truetype");
-}
-
-@custom-variant dark (&:is(.dark *));
-
-@theme {
-  --font-display: "Rubik", sans-serif;
-  --font-display-italic: "Rubik Italic", sans-serif;
-}
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
