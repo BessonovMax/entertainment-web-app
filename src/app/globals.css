@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: Rubik;
+  font-style: normal;
+  src: url("./assets/fonts/Rubik-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Rubik Italic";
+  font-style: italic;
+  src: url("./assets/fonts/Rubik-Italic-VariableFont_wght.ttf")
+    format("truetype");
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-display: "Rubik", sans-serif;
+  --font-display-italic: "Rubik Italic", sans-serif;
 }
 
 @theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card-background: var(--card-background);
+  --color-nav-item: var(--nav-item);
+  --color-primary: var(--text-primary);
+  --color-movie-card: var(--movie-card);
+  --color-login-card: var(--login-card);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --radius: 0.625rem;
+  --background: #10141e;
+  --foreground: #fc4747;
+  --card-background: #161d2f;
+  --nav-item: #5a698f;
+  --text-primary: 255 255 255; /* raw rgb channels */
+  --movie-card: rgb(var(--text-primary) / 0.75);
+  --login-card: rgb(var(--text-primary) / 0.5);
 }
