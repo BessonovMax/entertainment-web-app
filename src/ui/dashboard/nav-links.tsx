@@ -1,25 +1,30 @@
 "use client";
 import clsx from "clsx";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import HomeIcon from "@/ui/dashboard/icons/HomeIcon";
+import MoviesIcon from "@/ui/dashboard/icons/MoviesIcon";
+import SeriesIcon from "@/ui/dashboard/icons/SeriesIcon";
+import BookmarkedIcon from "@/ui/dashboard/icons/Bookmarked";
+
 const links = [
-  { name: "Home", href: "/dashboard", icon: "/icons/icon-nav-home.svg" },
+  { name: "Home", href: "/dashboard", icon: HomeIcon },
   {
     name: "Movies",
     href: "/dashboard/movies",
-    icon: "/icons/icon-nav-movies.svg",
+    icon: MoviesIcon,
   },
+
   {
     name: "Tv-Series",
     href: "/dashboard/tv-series",
-    icon: "/icons/icon-nav-tv-series.svg",
+    icon: SeriesIcon,
   },
   {
     name: "Bookmarked",
     href: "/dashboard/bookmarked",
-    icon: "/icons/icon-nav-bookmark.svg",
+    icon: BookmarkedIcon,
   },
 ];
 
@@ -28,22 +33,19 @@ export default function NavLinks() {
   return (
     <div className="flex gap-6 md:gap-8 lg:flex-col lg:gap-10">
       {links.map((link) => {
+        const LinkIcon = link.icon;
         return (
           <Link
             key={link.name}
             href={link.href}
-            className={clsx("flex items-center justify-center", {
-              "": pathname === link.href,
-            })}
+            className={clsx(
+              "text-nav-item hover:text-foreground flex items-center justify-center",
+              {
+                "text-white": pathname === link.href,
+              },
+            )}
           >
-            <div className="relative h-4 w-4 lg:h-5 lg:w-5">
-              <Image
-                src={link.icon}
-                alt={`${link.name} icon`}
-                fill
-                className="object-contain"
-              />
-            </div>
+            <LinkIcon className="size-4 md:size-5" />
           </Link>
         );
       })}
