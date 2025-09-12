@@ -12,6 +12,7 @@
   --color-primary: var(--text-primary);
   --color-movie-card: var(--movie-card);
   --color-login-card: var(--login-card);
+  --color-primary: rgb(var(--text-primary));
 }
 
 :root {
