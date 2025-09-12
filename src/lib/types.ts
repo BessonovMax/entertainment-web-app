@@ -17,3 +17,5 @@ export type ProductCardType = {
   isBookmarked: boolean;
   isTrending: boolean;
 };
+
+export type ProductListType = ProductCardType[];

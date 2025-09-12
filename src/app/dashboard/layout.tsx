@@ -4,13 +4,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
       <div>
-        <div className="flex h-full lg:flex-col">
+        <div className="flex h-dvh lg:flex-col">
           <div className="grow lg:my-8 lg:ml-8">
             <SideNav />
           </div>
         </div>
       </div>
-      {children}
+      <div className="mx-4 my-6 grow md:mx-[1.5625rem] md:my-8 lg:mx-[2.25rem] lg:my-16">
+        {children}
+      </div>
     </div>
   );
 }

@@ -13,11 +13,13 @@ export default function SideNav() {
           className="object-contain"
         />
       </div>
-      <NavLinks />
+      <div className="lg:mb-[4.5rem]">
+        <NavLinks />
+      </div>
       <div className="relative size-6 md:size-8 lg:mt-auto lg:size-10">
         <Image
           src={defaultAvatar}
-          alt="avatar icon"
+          alt="user icon"
           fill
           className="rounded-full border-1 border-white object-contain"
         />
