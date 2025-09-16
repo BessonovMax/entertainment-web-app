@@ -1,5 +1,5 @@
 import { ProductListType } from "@/lib/types";
-import ProductList from "@/ui/dashboard/product-list";
+import ProductList from "@/ui/dashboard/regular-product-list";
 import data from "@/data/data.json";
 
 export default function Page() {
