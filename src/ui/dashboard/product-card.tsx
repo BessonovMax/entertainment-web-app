@@ -33,7 +33,12 @@ export default function ProductCard({ product }: Props) {
           <div>{product.year}</div>
           <div className="flex items-center gap-2 before:mx-2 before:content-['•'] after:mx-2 after:content-['•']">
             <div className="relative size-[10px] md:size-[12px]">
-              <Image className="object-contain" fill alt="" src={iconSrc} />
+              <Image
+                className="object-contain"
+                fill
+                alt={`${product.category} icon`}
+                src={iconSrc}
+              />
             </div>
             <div>{product.category}</div>
           </div>
