@@ -13,17 +13,19 @@
   --color-movie-card: var(--movie-card);
   --color-login-card: var(--login-card);
   --color-primary: rgb(var(--text-primary));
+  --color-bookmarked-background: var(--bookmarked-background);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #10141e;
+  --background: rgba(16, 20, 30);
   --foreground: #fc4747;
   --card-background: #161d2f;
   --nav-item: #5a698f;
   --text-primary: 255 255 255; /* raw rgb channels */
   --movie-card: rgb(var(--text-primary) / 0.75);
   --login-card: rgb(var(--text-primary) / 0.5);
+  --bookmarked-background: rgba(16, 20, 30, 0.5);
 }
 
 /* --- The Fading Scrollbar Trick --- */

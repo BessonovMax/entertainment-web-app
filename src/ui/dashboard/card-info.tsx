@@ -1,14 +1,18 @@
 import { ProductCardType } from "@/lib/types";
 import Image from "next/image";
 
-export default function CardInfo(product: ProductCardType) {
+type Props = {
+  product: ProductCardType;
+  isTrending?: boolean;
+};
+
+export default function CardInfo({ product, isTrending }: Props) {
   const icons = {
     Movie: "/icons/icon-category-movie.svg",
     "TV Series": "/icons/icon-category-tv.svg",
   } as const;
 
   const iconSrc = icons[product.category as keyof typeof icons];
-  const isTrending = product.isTrending;
   return (
     <div className="flex flex-col gap-2">
       <div

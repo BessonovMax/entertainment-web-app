@@ -42,9 +42,9 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
         <div className="self-end">
           <ProductCardBookmarkedIcon product={product} />
         </div>
-        {isTrending && <CardInfo {...product} />}
+        {isTrending && <CardInfo product={product} isTrending={isTrending} />}
       </div>
-      {!isTrending && <CardInfo {...product} />}
+      {!isTrending && <CardInfo product={product} />}
     </div>
   );
 }

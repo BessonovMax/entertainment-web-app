@@ -10,7 +10,7 @@ export default function ProductCardBookmarkedIcon({ product }: Props) {
   return (
     <button
       type="button"
-      className="bg-background flex size-8 cursor-pointer items-center justify-center rounded-full text-white opacity-50 hover:bg-white hover:text-black hover:opacity-100"
+      className={`bg-bookmarked-background flex size-8 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white hover:text-black`}
     >
       {product.isBookmarked ? (
         <IconBookmarkFull className="" />
