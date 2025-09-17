@@ -3,10 +3,10 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import HomeIcon from "@/ui/dashboard/icons/HomeIcon";
-import MoviesIcon from "@/ui/dashboard/icons/MoviesIcon";
-import SeriesIcon from "@/ui/dashboard/icons/SeriesIcon";
-import BookmarkedIcon from "@/ui/dashboard/icons/Bookmarked";
+import HomeIcon from "@/ui/dashboard/icons/menuIcons/HomeIcon";
+import MoviesIcon from "@/ui/dashboard/icons/menuIcons/MoviesIcon";
+import SeriesIcon from "@/ui/dashboard/icons/menuIcons/SeriesIcon";
+import BookmarkedIcon from "@/ui/dashboard/icons/menuIcons/Bookmarked";
 
 const links = [
   { name: "Home", href: "/dashboard", icon: HomeIcon },

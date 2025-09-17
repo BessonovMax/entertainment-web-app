@@ -1,11 +1,8 @@
-import { ProductListType } from "@/lib/types";
-import ProductList from "@/ui/dashboard/regular-product-list";
-import data from "@/data/data.json";
+import { getProductsByCategory } from "@/lib/products";
+import RegularProductList from "@/ui/dashboard/regular-product-list";
 
 export default function Page() {
-  const movieProducts: ProductListType = data.filter((product) =>
-    product.category.includes("TV Series"),
-  );
+  const series = getProductsByCategory("TV Series");
 
   return (
     <div className="flex flex-col gap-6 md:gap-10">
@@ -16,7 +13,7 @@ export default function Page() {
           TV Series
         </h2>
         {/* <!-- Display recommended shows --> */}
-        <ProductList products={movieProducts} />
+        <RegularProductList products={series} />
       </div>
     </div>
   );
