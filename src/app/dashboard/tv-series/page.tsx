@@ -3,7 +3,6 @@ import RegularProductList from "@/ui/dashboard/regular-product-list";
 
 export default function Page() {
   const series = getProductsByCategory("TV Series");
-
   return (
     <div className="flex flex-col gap-6 md:gap-10">
       Search for TV Series

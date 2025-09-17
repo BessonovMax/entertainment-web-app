@@ -9,7 +9,9 @@ export function getRegularProducts(): ProductCardType[] {
   return data.filter((product) => !product.isTrending);
 }
 
-export function getProductsByCategory(category: string): ProductCardType[] {
+export function getProductsByCategory(
+  category: "Movie" | "TV Series",
+): ProductCardType[] {
   return data.filter((product) => product.category === category);
 }
 
