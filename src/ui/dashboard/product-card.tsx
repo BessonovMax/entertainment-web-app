@@ -1,7 +1,7 @@
 import { type ProductCardType } from "@/lib/types";
 import CardInfo from "@/ui/dashboard/card-info";
 import Image from "next/image";
-import ProductCardBookmarkedIcon from "./icons/ProductCardBookmarkedIcon";
+import ProductCardBookmarkedIcon from "./bookmarked/ProductCardBookmarkedIcon";
 import clsx from "clsx";
 
 type Props = {
@@ -41,7 +41,7 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
         style={cardStyle as React.CSSProperties}
       >
         <div className="justify-self-end">
-          <ProductCardBookmarkedIcon product={product} />
+          <ProductCardBookmarkedIcon title={product.title} />
         </div>
         <div className="flex min-w-[117px] grow-0 cursor-pointer items-center gap-3 self-center justify-self-center rounded-full bg-black/50 p-[9px] opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white/25">
           <div className="relative flex size-7.5">

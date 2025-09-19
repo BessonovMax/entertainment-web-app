@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import AuthCardWrapper from "@/ui/auth-card-wrapper";
+import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
 
 export default function Page() {
   const loggedIn = false;

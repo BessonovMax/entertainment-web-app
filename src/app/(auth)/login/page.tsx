@@ -1,5 +1,5 @@
 "use client";
-import AuthCardWrapper from "@/ui/auth-card-wrapper";
+import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
 import clsx from "clsx";
 import Link from "next/link";
 import { redirect } from "next/navigation";

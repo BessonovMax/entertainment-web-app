@@ -1,6 +1,10 @@
 import data from "@/data/data.json";
 import { type ProductCardType } from "@/lib/types";
 
+export function getAllProducts(): ProductCardType[] {
+  return data;
+}
+
 export function getTrendingProducts(): ProductCardType[] {
   return data.filter((product) => product.isTrending);
 }
