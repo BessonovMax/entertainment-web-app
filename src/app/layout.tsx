@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.className} bg-background text-primary antialiased`}
+        className={`${outfit.className} bg-background text-primary min-h-dvh antialiased`}
       >
         {children}
       </body>

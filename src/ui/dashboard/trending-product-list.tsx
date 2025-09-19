@@ -13,7 +13,7 @@ export default function TrendingProductList({ trendingProducts }: Props) {
   return (
     <div
       ref={scrollRef}
-      className="scrollbar-thin flex gap-4 overflow-x-auto md:gap-10"
+      className="scrollbar-thin flex gap-4 overflow-x-auto pb-2 md:gap-10"
     >
       {trendingProducts.map((product) => (
         <ProductCard
