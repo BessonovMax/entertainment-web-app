@@ -1,6 +1,5 @@
 import { type ProductCardType } from "@/lib/types";
 import CardInfo from "@/ui/dashboard/card-info";
-import Image from "next/image";
 import ProductCardBookmarkedIcon from "./bookmarked/ProductCardBookmarkedIcon";
 import clsx from "clsx";
 
@@ -23,7 +22,7 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
 
   return (
     <div
-      className={clsx("flex flex-col gap-2", {
+      className={clsx("flex cursor-pointer flex-col gap-2", {
         "w-[15rem] shrink-0 md:w-[29.375rem]": isTrending,
         "w-[10.25rem] md:w-[13.75rem] lg:w-[17.5rem]": !isTrending,
       })}
@@ -34,7 +33,7 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
           {
             "h-[8.75rem] px-4 py-[0.875rem] md:h-[14.375rem] md:px-6 md:py-[1.34375rem]":
               isTrending,
-            "h-[6.875rem] p-2 md:h-[8.75rem] md:p-4 lg:h-[10.875rem]":
+            "h-[14rem] bg-center p-2 md:h-[16rem] md:p-4 lg:h-[20rem]":
               !isTrending,
           },
         )}
@@ -43,14 +42,8 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
         <div className="justify-self-end">
           <ProductCardBookmarkedIcon title={product.title} />
         </div>
-        <div className="flex min-w-[117px] grow-0 cursor-pointer items-center gap-3 self-center justify-self-center rounded-full bg-black/50 p-[9px] opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white/25">
-          <div className="relative flex size-7.5">
-            <Image fill src="/icons/icon-play.svg" alt="play icon" />
-          </div>
-          <p className="text-lg">Play</p>
-        </div>
         {isTrending ? (
-          <div className="self-end">
+          <div className="row-start-3">
             <CardInfo product={product} isTrending={isTrending} />
           </div>
         ) : (

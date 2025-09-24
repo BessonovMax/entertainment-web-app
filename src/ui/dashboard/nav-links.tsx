@@ -2,6 +2,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Tooltip } from "antd";
 
 import HomeIcon from "@/ui/dashboard/icons/menuIcons/HomeIcon";
 import MoviesIcon from "@/ui/dashboard/icons/menuIcons/MoviesIcon";
@@ -35,18 +36,19 @@ export default function NavLinks() {
       {links.map((link) => {
         const LinkIcon = link.icon;
         return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={clsx(
-              "text-nav-item hover:text-foreground flex items-center justify-center",
-              {
-                "text-white": pathname === link.href,
-              },
-            )}
-          >
-            <LinkIcon className="size-4 md:size-5" />
-          </Link>
+          <Tooltip key={link.name} title={link.name} placement="bottomLeft">
+            <Link
+              href={link.href}
+              className={clsx(
+                "text-nav-item hover:text-foreground flex items-center justify-center",
+                {
+                  "text-white": pathname === link.href,
+                },
+              )}
+            >
+              <LinkIcon className="size-4 md:size-5" />
+            </Link>
+          </Tooltip>
         );
       })}
     </div>

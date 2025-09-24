@@ -2,6 +2,7 @@ import RegularProductList from "@/ui/dashboard/regular-product-list";
 import TrendingProductList from "@/ui/dashboard/trending-product-list";
 import { searchAllProducts } from "@/lib/products";
 import SearchInput from "@/ui/dashboard/search-input";
+import { getPopularMedia, getTrendingMedia } from "@/lib/tmdb";
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -14,12 +15,10 @@ export default async function Page(props: {
   // Perform the search once on the server
   const filteredProducts = searchAllProducts(query);
 
-  const trendingProducts = filteredProducts.filter(
-    (product) => product.isTrending,
-  );
-  const regularProducts = filteredProducts.filter(
-    (product) => !product.isTrending,
-  );
+  const [trendingProducts, regularProducts] = await Promise.all([
+    getTrendingMedia(),
+    getPopularMedia(), // Используем популярные фильмы как "рекомендованные"
+  ]);
 
   return (
     <>
@@ -47,7 +46,7 @@ export default async function Page(props: {
             </div>
             <div className="flex flex-col gap-6 lg:gap-8">
               <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
-                Recommended for you
+                Popular
               </h2>
               <RegularProductList products={regularProducts} />
             </div>
