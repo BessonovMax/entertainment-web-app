@@ -29,6 +29,16 @@ export type TmdbResult = {
   first_air_date?: string; // У сериалов
   poster_path: string | null;
   backdrop_path: string | null;
-  media_type?: "movie" | "tv";
+  media_type?: "movie" | "tv" | "person";
+
   adult?: boolean;
 };
+
+export type PaginatedResponse = {
+  page: number;
+  results: ProductListType;
+  totalPages: number;
+  totalResults: number;
+};
+
+export type MediaType = "movie" | "tv" | "multi";

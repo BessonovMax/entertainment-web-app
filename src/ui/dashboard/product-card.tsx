@@ -42,12 +42,10 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
         <div className="justify-self-end">
           <ProductCardBookmarkedIcon title={product.title} />
         </div>
-        {isTrending ? (
+        {isTrending && (
           <div className="row-start-3">
             <CardInfo product={product} isTrending={isTrending} />
           </div>
-        ) : (
-          <div className="self-end"></div>
         )}
       </div>
       {!isTrending && <CardInfo product={product} />}

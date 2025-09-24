@@ -1,4 +1,4 @@
-import { searchProductsByCategory } from "@/lib/products";
+import { getPopularMedia, searchMedia } from "@/lib/tmdb";
 import RegularProductList from "@/ui/dashboard/regular-product-list";
 import SearchInput from "@/ui/dashboard/search-input";
 
@@ -9,9 +9,14 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.search || "";
+  const media_type = "tv";
 
-  // Perform the search once on the server
-  const series = searchProductsByCategory(query, "TV Series");
+  const response = await searchMedia(query, 1, media_type);
+  const searchedProducts = response.results;
+  const totalPages = response.totalPages;
+  const totalResults = response.totalResults;
+
+  const series = await getPopularMedia(1, media_type);
 
   return (
     <div className="flex flex-col gap-6 md:gap-10">
@@ -19,13 +24,18 @@ export default async function Page(props: {
       {query ? (
         <div>
           <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
-            Found {series.length} results for &apos;
+            Found {totalResults} results for &apos;
             {query}
             &apos;
           </h2>
           {/* Display all results in one list when searching */}
+
           <div className="mt-6">
-            <RegularProductList products={series} />
+            <RegularProductList
+              totalPages={totalPages}
+              media_type={media_type}
+              initialProducts={searchedProducts}
+            />
           </div>
         </div>
       ) : (
@@ -36,7 +46,10 @@ export default async function Page(props: {
               TV Series
             </h2>
             {/* <!-- Display recommended shows --> */}
-            <RegularProductList products={series} />
+            <RegularProductList
+              media_type={media_type}
+              initialProducts={series}
+            />
           </div>
         </>
       )}

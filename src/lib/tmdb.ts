@@ -1,6 +1,12 @@
 // src/lib/tmdb.ts
 
-import { type ProductCardType, type TmdbResult } from "./types";
+import type {
+  ProductListType,
+  ProductCardType,
+  TmdbResult,
+  PaginatedResponse,
+  MediaType,
+} from "@/lib/types";
 
 // Константы для удобства
 const TMDB_API_TOKEN = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -53,7 +59,7 @@ function seededShuffle<T>(array: T[], seed: string | number): T[] {
 function mapTmdbToProductCard(item: TmdbResult): ProductCardType {
   const posterPath = item.poster_path
     ? `${TMDB_IMAGE_BASE_URL}w500${item.poster_path}`
-    : "/assets/placeholder.png"; // Убедитесь, что у вас есть запасное изображение
+    : "/thumbnails/No-Image-Placeholder.svg"; // Убедитесь, что у вас есть запасное изображение
   const backdropPath = item.backdrop_path
     ? `${TMDB_IMAGE_BASE_URL}w1280${item.backdrop_path}`
     : posterPath; // Если нет фона, используем постер
@@ -81,13 +87,12 @@ function mapTmdbToProductCard(item: TmdbResult): ProductCardType {
   };
 }
 
-/**
- * Основная функция для выполнения запросов к TMDB API.
- * Она скрывает логику авторизации.
- */
-async function fetchFromTMDB(
-  endpoint: string,
-): Promise<{ results: TmdbResult[] }> {
+async function fetchFromTMDB(endpoint: string): Promise<{
+  total_results: number;
+  total_pages: number;
+  page: number;
+  results: TmdbResult[];
+}> {
   if (!TMDB_API_TOKEN) {
     throw new Error(
       "TMDB API Token is not configured in environment variables.",
@@ -111,56 +116,81 @@ async function fetchFromTMDB(
     const response = await fetch(url, options);
     if (!response.ok) {
       console.error(`TMDB API Error: ${response.statusText}`);
-      return { results: [] }; // Возвращаем пустой массив при ошибке
+      return { page: 1, results: [], total_pages: 0, total_results: 0 }; // Возвращаем пустой массив при ошибке
     }
     return await response.json();
   } catch (error) {
     console.error("Failed to fetch from TMDB:", error);
-    return { results: [] };
+    return { page: 1, results: [], total_pages: 0, total_results: 0 };
   }
 }
 
-// --- Публичные функции, которые будут использовать ваши компоненты ---
-
-/**
- * Получает список трендовых медиа (фильмы и сериалы) за неделю.
- */
-export async function getTrendingMedia(): Promise<ProductCardType[]> {
-  const data = await fetchFromTMDB("trending/all/day");
+export async function getTrendingMedia(): Promise<ProductListType> {
+  const data = await fetchFromTMDB("trending/all/week");
   const mappedData = data.results.map(mapTmdbToProductCard);
   // Устанавливаем флаг isTrending для этих результатов
   mappedData.forEach((item: ProductCardType) => (item.isTrending = true));
   return mappedData;
 }
 
-export async function getPopularMedia(): Promise<ProductCardType[]> {
-  // --- Шаг 1: Запрашиваем оба списка ПАРАЛЛЕЛЬНО для лучшей производительности ---
-  // Promise.all выполняет оба запроса одновременно, а не один за другим.
-  const [moviesResponse, tvResponse] = await Promise.all([
-    fetchFromTMDB("movie/popular?language=en-US&page=1"),
-    fetchFromTMDB("tv/popular?language=en-US&page=1"),
-  ]);
+export async function getPopularMedia(
+  page: number = 1,
+  media_type: MediaType = "multi",
+): Promise<ProductListType> {
+  if (media_type === "multi") {
+    const [resultMovies, resultTvShows] = await Promise.all([
+      fetchFromTMDB(`movie/popular?language=en-US&page=${page}`),
+      fetchFromTMDB(`tv/popular?language=en-US&page=${page}`),
+    ]);
 
-  // Извлекаем массивы результатов, предусматривая возможные ошибки
-  const popularMovies: TmdbResult[] = moviesResponse.results || [];
-  const popularTvShows: TmdbResult[] = tvResponse.results || [];
+    const popularMovies = resultMovies.results.map(mapTmdbToProductCard);
+    const popularTvShows = resultTvShows.results.map(mapTmdbToProductCard);
 
-  // --- Шаг 2: Объединяем два массива в один ---
-  const combinedMedia = [...popularMovies, ...popularTvShows];
-  const seed = new Date().toISOString().slice(0, 10);
-  // --- Шаг 3: Перемешиваем объединенный массив для лучшего UX ---
-  const shuffledMedia = seededShuffle(combinedMedia, seed);
+    const combinedMedia = [...popularMovies, ...popularTvShows];
+    const seed = `${new Date().toISOString().slice(0, 10)}-page-${page}`;
 
-  // --- Шаг 4: Преобразуем финальный, перемешанный массив в наш унифицированный тип ---
-  return shuffledMedia.map(mapTmdbToProductCard);
+    const shuffledMedia = seededShuffle(combinedMedia, seed);
+
+    return shuffledMedia;
+  } else if (media_type === "movie" || media_type === "tv") {
+    const data = await fetchFromTMDB(
+      `${media_type}/popular?language=en-US&page=${page}`,
+    );
+    return data.results.map(mapTmdbToProductCard);
+  }
+  return [];
 }
 
-/**
- * Получает список популярных фильмов.
- */
-export async function getPopularMovies(): Promise<ProductCardType[]> {
-  const data = await fetchFromTMDB("movie/popular");
-  return data.results.map(mapTmdbToProductCard);
-}
+export async function searchMedia(
+  query: string,
+  page: number = 1,
+  media_type: MediaType,
+): Promise<PaginatedResponse> {
+  const encodedQuery = encodeURIComponent(query);
 
-// Вы можете добавить больше функций здесь: getPopularTvShows, searchMedia(query) и т.д.
+  const data = await fetchFromTMDB(
+    `search/${media_type}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
+  );
+
+  if (!data.results) {
+    return { page: 1, results: [], totalPages: 0, totalResults: 0 };
+  }
+
+  let finalResults = data.results;
+
+  if (media_type === "multi") {
+    finalResults = data.results.filter(
+      (item: TmdbResult) =>
+        item.media_type === "movie" || item.media_type === "tv",
+    );
+  }
+
+  const mappedResults = finalResults.map(mapTmdbToProductCard);
+
+  return {
+    page: data.page,
+    results: mappedResults,
+    totalPages: data.total_pages,
+    totalResults: data.total_results,
+  };
+}

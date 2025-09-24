@@ -1,8 +1,8 @@
 import RegularProductList from "@/ui/dashboard/regular-product-list";
 import TrendingProductList from "@/ui/dashboard/trending-product-list";
-import { searchAllProducts } from "@/lib/products";
+
 import SearchInput from "@/ui/dashboard/search-input";
-import { getPopularMedia, getTrendingMedia } from "@/lib/tmdb";
+import { getPopularMedia, getTrendingMedia, searchMedia } from "@/lib/tmdb";
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -11,13 +11,16 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.search || "";
+  const media_type = "multi";
 
-  // Perform the search once on the server
-  const filteredProducts = searchAllProducts(query);
+  const response = await searchMedia(query, 1, media_type);
+  const searchedProducts = response.results;
+  const totalPages = response.totalPages;
+  const totalResults = response.totalResults;
 
   const [trendingProducts, regularProducts] = await Promise.all([
     getTrendingMedia(),
-    getPopularMedia(), // Используем популярные фильмы как "рекомендованные"
+    getPopularMedia(1, media_type), // Используем популярные фильмы как "рекомендованные"
   ]);
 
   return (
@@ -27,13 +30,18 @@ export default async function Page(props: {
         {query ? (
           <div>
             <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
-              Found {filteredProducts.length} results for &apos;
+              Found {totalResults} results for &apos;
               {query}
               &apos;
             </h2>
             {/* Display all results in one list when searching */}
+
             <div className="mt-6">
-              <RegularProductList products={filteredProducts} />
+              <RegularProductList
+                totalPages={totalPages}
+                media_type={media_type}
+                initialProducts={searchedProducts}
+              />
             </div>
           </div>
         ) : (
@@ -48,7 +56,10 @@ export default async function Page(props: {
               <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
                 Popular
               </h2>
-              <RegularProductList products={regularProducts} />
+              <RegularProductList
+                media_type={media_type}
+                initialProducts={regularProducts}
+              />
             </div>
           </>
         )}

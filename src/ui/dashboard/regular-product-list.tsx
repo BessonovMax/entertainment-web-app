@@ -1,16 +1,86 @@
-import { type ProductListType } from "@/lib/types";
+"use client";
+
+import { fetchMoreMedia, searchMoreMedia } from "@/app/actions";
+import { MediaType, type ProductListType } from "@/lib/types";
 import ProductCard from "@/ui/dashboard/product-card";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 
 type Props = {
-  products: ProductListType;
+  initialProducts: ProductListType;
+  media_type?: MediaType;
+  totalPages?: number;
 };
 
-export default function RegularProductList({ products }: Props) {
+export default function RegularProductList({
+  initialProducts,
+  media_type = "multi",
+  totalPages = 10,
+}: Props) {
+  const [products, setProducts] = useState<ProductListType>(initialProducts);
+  const [page, setPage] = useState(2); // The next page to fetch is page 2
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [displayedProductIds, setDisplayedProductIds] = useState(
+    new Set(initialProducts.map((p) => p.id)),
+  );
+
+  const searchParams = useSearchParams();
+
+  const query = searchParams?.get("search") || "";
+
+  // To avoid duplicates when loading more products
+  const loadMoreProducts = useCallback(async () => {
+    setIsLoading(true);
+    // Determine which fetch function to call on Load More based on mediaType
+    let moreProducts: ProductListType = await fetchMoreMedia(page, media_type);
+
+    if (query) {
+      // If there's a search query, fetch more search results
+      const response = await searchMoreMedia(query, page, media_type);
+      moreProducts = response.results;
+    }
+
+    if (moreProducts.length > 0) {
+      const uniqueNewProducts: ProductListType = [];
+      const newDisplayedIds = new Set(displayedProductIds);
+
+      for (const product of moreProducts) {
+        if (!newDisplayedIds.has(product.id)) {
+          uniqueNewProducts.push(product);
+          newDisplayedIds.add(product.id);
+        }
+      }
+
+      setPage((prevPage) => prevPage + 1);
+      setProducts((prevProducts) => [...prevProducts, ...uniqueNewProducts]);
+      setDisplayedProductIds(newDisplayedIds);
+    }
+    setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, displayedProductIds]);
+
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(10.25rem,1fr))] gap-x-[15px] gap-y-4 md:grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))] md:gap-x-[30px] md:gap-y-6 lg:grid-cols-[repeat(auto-fill,minmax(17.5rem,1fr))] lg:gap-x-[40px]">
-      {products.map((product) => (
-        <ProductCard key={product.title} product={product} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(10.25rem,1fr))] gap-x-[15px] gap-y-4 md:grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))] md:gap-x-[30px] md:gap-y-6 lg:grid-cols-[repeat(auto-fill,minmax(17.5rem,1fr))] lg:gap-x-[40px]">
+        {products.length === 0 && (
+          <p className="mt-4 text-center text-gray-500">No results found.</p>
+        )}
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+      <div className="mt-8 flex justify-center">
+        {page <= totalPages && ( // Only show the button for up to 10 pages
+          <button
+            onClick={loadMoreProducts}
+            disabled={isLoading}
+            className="bg-foreground hover:text-background cursor-pointer rounded-sm px-6 py-3 text-xl font-medium text-white transition hover:bg-white disabled:cursor-not-allowed disabled:bg-gray-500"
+          >
+            {isLoading ? "Loading..." : "Load More"}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
