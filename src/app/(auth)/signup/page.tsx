@@ -1,4 +1,5 @@
 "use client";
+import { createClient } from "@/lib/supabase/client";
 import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
 import clsx from "clsx";
 import Link from "next/link";
@@ -12,13 +13,18 @@ export default function Page() {
     email: "",
     password: "",
     repeatPassword: "",
+    api: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const supabase = createClient();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent the default form submission (page reload)
-
+    setIsLoading(true);
     // Create a temporary errors object
-    const newErrors = { email: "", password: "", repeatPassword: "" };
+    const newErrors = { email: "", password: "", repeatPassword: "", api: "" };
     let hasError = false;
 
     // Validate email
@@ -35,6 +41,9 @@ export default function Page() {
     if (!password.trim()) {
       newErrors.password = "Can't be empty";
       hasError = true;
+    } else if (password.length < 6) {
+      newErrors.password = "Min 6 characters";
+      hasError = true;
     }
 
     // Validate password
@@ -46,14 +55,55 @@ export default function Page() {
       hasError = true;
     }
 
-    setErrors(newErrors);
+    setErrors((prev) => ({ ...prev, ...newErrors }));
 
     // If there are no errors, proceed with submission
-    if (!hasError) {
-      console.log("Form is valid! Submitting...", { email, password });
-      // Here you would typically call your authentication API
+    if (hasError) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error: apiError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (apiError) {
+        setErrors((prev) => ({ ...prev, api: apiError.message }));
+      } else if (data.user) {
+        // Успешная регистрация! Показываем сообщение.
+        setIsSuccess(true);
+      }
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, api: "An unexpected error occurred." }));
+      console.error("Submission failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <AuthCardWrapper>
+        <div className="flex flex-col gap-6">
+          <h2 className="text-[2rem] leading-[125%] font-light tracking-[-0.5px]">
+            Check your email
+          </h2>
+          <p className="text-movie-card text-[0.9375rem] font-light">
+            We&rsquo;ve sent a confirmation link to{" "}
+            <span className="font-bold">{email}</span>.
+          </p>
+          <Link
+            className="bg-foreground hover:text-background rounded-[6px] px-4 py-1 text-center hover:bg-white md:px-6 md:py-2 md:text-xl"
+            href="/login"
+          >
+            Login
+          </Link>
+        </div>
+      </AuthCardWrapper>
+    );
+  }
 
   return (
     <AuthCardWrapper>
@@ -152,11 +202,17 @@ export default function Page() {
             )}
           </div>
         </div>
+
+        {errors.api && (
+          <p className="text-foreground text-center font-light">{errors.api}</p>
+        )}
+
         <div className="flex flex-col gap-6 text-[0.9375rem] font-light">
           <input
             type="submit"
-            value={"Create an account"}
-            className="bg-foreground hover:text-background cursor-pointer rounded-[6px] py-[0.78125rem] hover:bg-white"
+            value={isLoading ? "Creating account..." : "Create an account"}
+            disabled={isLoading}
+            className="bg-foreground hover:text-background cursor-pointer rounded-[6px] py-[0.78125rem] hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
           />
           <div className="flex justify-center gap-2">
             <p>Already have an account?</p>

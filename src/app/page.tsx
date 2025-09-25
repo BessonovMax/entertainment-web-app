@@ -2,12 +2,17 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Page() {
-  const loggedIn = false;
+export default async function Page() {
+  const supabase = await createClient();
 
-  if (loggedIn) {
-    redirect("/dashboard");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login"); // Если пользователя нет, перенаправляем
   }
 
   return (

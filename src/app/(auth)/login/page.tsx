@@ -1,17 +1,24 @@
 "use client";
+import { createClient } from "@/lib/supabase/client";
 import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
 import clsx from "clsx";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "", api: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const supabase = createClient();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent the default form submission (page reload)
+    setIsLoading(true); // Включаем индикатор загрузки
+    setErrors({ ...errors, api: "" }); // Очищаем предыдущие ошибки API
 
     // Create a temporary errors object
     const newErrors = { email: "", password: "" };
@@ -33,13 +40,41 @@ export default function Page() {
       hasError = true;
     }
 
-    setErrors(newErrors);
+    setErrors((prevErrors) => ({ ...prevErrors, ...newErrors }));
 
     // If there are no errors, proceed with submission
-    if (!hasError) {
-      console.log("Form is valid! Submitting...", { email, password });
-      // Here you would typically call your authentication API
-      redirect("/dashboard");
+    if (hasError) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error: apiError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (apiError) {
+        setErrors((prevErrors) => ({ ...prevErrors, api: apiError.message }));
+      } else if (data.user) {
+        console.log("Logged in successfully!", data.user);
+        router.push("/dashboard"); // Перенаправляем на дашборд
+        router.refresh(); // Обязательно делаем refresh, чтобы обновить сессию на сервере
+      } else {
+        // Это может произойти, если нет ошибки, но и нет пользователя (редко)
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          api: "An unexpected error occurred.",
+        }));
+      }
+    } catch (error) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        api: "Network or unexpected error.",
+      }));
+      console.error("Submission failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -111,11 +146,17 @@ export default function Page() {
             )}
           </div>
         </div>
+
+        {errors.api && (
+          <p className="text-foreground text-center">{errors.api}</p>
+        )}
+
         <div className="flex flex-col gap-6 text-[0.9375rem] font-light">
           <input
             type="submit"
-            value={"Login to your account"}
-            className="bg-foreground hover:text-background cursor-pointer rounded-[6px] py-[0.78125rem] hover:bg-white"
+            value={isLoading ? "Logging in..." : "Login to your account"}
+            disabled={isLoading}
+            className="bg-foreground hover:text-background cursor-pointer rounded-[6px] py-[0.78125rem] hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
           />
           <div className="flex justify-center gap-2">
             <p>Don&rsquo;t have an account?</p>

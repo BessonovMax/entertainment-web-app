@@ -38,6 +38,7 @@ export default function SearchInput({ placeholder }: { placeholder: string }) {
       <input
         type="text"
         placeholder={placeholder}
+        name="search-input"
         className="placeholder-login-card caret-foreground w-full border-b border-transparent pb-2.5 font-light text-white focus:border-gray-500 focus:outline-none md:text-2xl"
         // Set the default value from the URL search param on initial load
         defaultValue={searchParams.get("search")?.toString()}

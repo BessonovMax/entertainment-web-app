@@ -41,7 +41,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
           </h2>
           {/* Display all results in one list when searching */}
           <div className="mt-6">
-            <RegularProductList products={searchResults} />
+            <RegularProductList initialProducts={searchResults} />
           </div>
         </div>
       ) : (
@@ -53,7 +53,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
             {bookmarkedMovies.length === 0 ? (
               <p>No bookmarked Movies found.</p>
             ) : (
-              <RegularProductList products={bookmarkedMovies} />
+              <RegularProductList initialProducts={bookmarkedMovies} />
             )}
           </div>
           {/* <!-- Display bookmarked movies --> */}
@@ -64,7 +64,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
             {bookmarkedTVSeries.length === 0 ? (
               <p>No bookmarked TV series found.</p>
             ) : (
-              <RegularProductList products={bookmarkedTVSeries} />
+              <RegularProductList initialProducts={bookmarkedTVSeries} />
             )}
           </div>
           {/* <!-- Display bookmarked TV series --> */}
