@@ -1,14 +1,14 @@
 "use client";
 
 import { fetchMoreMedia, searchMoreMedia } from "@/app/actions";
-import { MediaType, type ProductListType } from "@/lib/types";
+import { type ProductListType } from "@/lib/types";
 import ProductCard from "@/ui/dashboard/product-card";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
 type Props = {
   initialProducts: ProductListType;
-  media_type?: MediaType;
+  media_type?: "movie" | "tv" | "multi";
   totalPages?: number;
 };
 

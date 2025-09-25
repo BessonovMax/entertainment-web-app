@@ -40,7 +40,7 @@ export default function ProductCard({ product, isTrendingProduct }: Props) {
         style={cardStyle as React.CSSProperties}
       >
         <div className="justify-self-end">
-          <ProductCardBookmarkedIcon title={product.title} />
+          <ProductCardBookmarkedIcon product={product} />
         </div>
         {isTrending && (
           <div className="row-start-3">

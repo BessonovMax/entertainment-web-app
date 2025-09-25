@@ -7,6 +7,7 @@ import type {
   PaginatedResponse,
   MediaType,
 } from "@/lib/types";
+import { createClient } from "./supabase/server";
 
 // Константы для удобства
 const TMDB_API_TOKEN = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -56,7 +57,11 @@ function seededShuffle<T>(array: T[], seed: string | number): T[] {
  * Преобразует один объект, полученный от TMDB API,
  * в унифицированный формат ProductCardType, который используют ваши компоненты.
  */
-function mapTmdbToProductCard(item: TmdbResult): ProductCardType {
+function mapTmdbToProductCard(
+  item: TmdbResult,
+  bookmarkedIds: Set<number>,
+  forcedType?: MediaType,
+): ProductCardType {
   const posterPath = item.poster_path
     ? `${TMDB_IMAGE_BASE_URL}w500${item.poster_path}`
     : "/thumbnails/No-Image-Placeholder.svg"; // Убедитесь, что у вас есть запасное изображение
@@ -64,13 +69,20 @@ function mapTmdbToProductCard(item: TmdbResult): ProductCardType {
     ? `${TMDB_IMAGE_BASE_URL}w1280${item.backdrop_path}`
     : posterPath; // Если нет фона, используем постер
 
+  const mediaType: MediaType =
+    forcedType ||
+    (item.media_type === "movie" || item.media_type === "tv"
+      ? item.media_type
+      : null) ||
+    (item.title ? "movie" : "tv");
+
+  const category = mediaType === "movie" ? "Movie" : "TV Series";
+
   // Определяем год, название и категорию в зависимости от типа медиа
-  const isMovie = item.media_type === "movie" || !!item.title;
   const year =
     new Date(item.release_date || item.first_air_date || "").getFullYear() ||
     2024;
   const title = item.title || item.name || "Unknown Title";
-  const category = isMovie ? "Movie" : "TV Series";
 
   return {
     id: item.id,
@@ -81,8 +93,9 @@ function mapTmdbToProductCard(item: TmdbResult): ProductCardType {
     },
     year: year,
     category: category,
+    media_type: mediaType,
     rating: item.adult ? "18+" : "PG", // Упрощенное определение рейтинга
-    isBookmarked: false, // TMDB не знает о ваших закладках. Это будет false по умолчанию.
+    isBookmarked: bookmarkedIds.has(item.id),
     isTrending: false, // Мы будем устанавливать этот флаг в зависимости от эндпоинта
   };
 }
@@ -125,9 +138,33 @@ async function fetchFromTMDB(endpoint: string): Promise<{
   }
 }
 
+async function getUserBookmarkedIds(): Promise<Set<number>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return new Set();
+
+  const { data: bookmarks, error } = await supabase
+    .from("bookmarks")
+    .select("media_id")
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error fetching bookmarked IDs:", error);
+    return new Set();
+  }
+  return new Set(bookmarks?.map((b) => b.media_id) || []);
+}
+
 export async function getTrendingMedia(): Promise<ProductListType> {
-  const data = await fetchFromTMDB("trending/all/week");
-  const mappedData = data.results.map(mapTmdbToProductCard);
+  const [data, bookmarkedIds] = await Promise.all([
+    fetchFromTMDB("trending/all/week"),
+    getUserBookmarkedIds(),
+  ]);
+  const mappedData = data.results.map((item) =>
+    mapTmdbToProductCard(item, bookmarkedIds),
+  );
   // Устанавливаем флаг isTrending для этих результатов
   mappedData.forEach((item: ProductCardType) => (item.isTrending = true));
   return mappedData;
@@ -135,16 +172,21 @@ export async function getTrendingMedia(): Promise<ProductListType> {
 
 export async function getPopularMedia(
   page: number = 1,
-  media_type: MediaType = "multi",
+  media_type: "movie" | "tv" | "multi" = "multi",
 ): Promise<ProductListType> {
   if (media_type === "multi") {
-    const [resultMovies, resultTvShows] = await Promise.all([
+    const [resultMovies, resultTvShows, bookmarkedIds] = await Promise.all([
       fetchFromTMDB(`movie/popular?language=en-US&page=${page}`),
       fetchFromTMDB(`tv/popular?language=en-US&page=${page}`),
+      getUserBookmarkedIds(),
     ]);
 
-    const popularMovies = resultMovies.results.map(mapTmdbToProductCard);
-    const popularTvShows = resultTvShows.results.map(mapTmdbToProductCard);
+    const popularMovies = resultMovies.results.map((item) =>
+      mapTmdbToProductCard(item, bookmarkedIds),
+    );
+    const popularTvShows = resultTvShows.results.map((item) =>
+      mapTmdbToProductCard(item, bookmarkedIds),
+    );
 
     const combinedMedia = [...popularMovies, ...popularTvShows];
     const seed = `${new Date().toISOString().slice(0, 10)}-page-${page}`;
@@ -153,10 +195,14 @@ export async function getPopularMedia(
 
     return shuffledMedia;
   } else if (media_type === "movie" || media_type === "tv") {
-    const data = await fetchFromTMDB(
-      `${media_type}/popular?language=en-US&page=${page}`,
+    const [data, bookmarkedIds] = await Promise.all([
+      fetchFromTMDB(`${media_type}/popular?language=en-US&page=${page}`),
+      getUserBookmarkedIds(),
+    ]);
+
+    return data.results.map((item) =>
+      mapTmdbToProductCard(item, bookmarkedIds, media_type),
     );
-    return data.results.map(mapTmdbToProductCard);
   }
   return [];
 }
@@ -164,13 +210,16 @@ export async function getPopularMedia(
 export async function searchMedia(
   query: string,
   page: number = 1,
-  media_type: MediaType,
+  media_type: "movie" | "tv" | "multi",
 ): Promise<PaginatedResponse> {
   const encodedQuery = encodeURIComponent(query);
 
-  const data = await fetchFromTMDB(
-    `search/${media_type}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
-  );
+  const [data, bookmarkedIds] = await Promise.all([
+    fetchFromTMDB(
+      `search/${media_type}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
+    ),
+    getUserBookmarkedIds(),
+  ]);
 
   if (!data.results) {
     return { page: 1, results: [], totalPages: 0, totalResults: 0 };
@@ -185,7 +234,9 @@ export async function searchMedia(
     );
   }
 
-  const mappedResults = finalResults.map(mapTmdbToProductCard);
+  const mappedResults = finalResults.map((item) =>
+    mapTmdbToProductCard(item, bookmarkedIds),
+  );
 
   return {
     page: data.page,

@@ -1,5 +1,3 @@
-"use client";
-import { useBookmarks } from "@/context/BookmarkedContext";
 import { ProductCardType } from "@/lib/types";
 import RegularProductList from "@/ui/dashboard/regular-product-list";
 
@@ -9,16 +7,8 @@ type Props = {
 };
 
 export default function BookmarkedContent({ allProducts, query }: Props) {
-  const { bookmarkedTitles } = useBookmarks();
-
-  // 1. Фильтруем ВЕСЬ список продуктов, чтобы найти те,
-  //    чьи названия есть в нашем АКТУАЛЬНОМ состоянии закладок.
-  const bookmarkedProducts = allProducts.filter((product) =>
-    bookmarkedTitles.has(product.title),
-  );
-
   // 2. Применяем поисковую фильтрацию к уже отфильтрованному списку закладок.
-  const searchResults = bookmarkedProducts.filter((product) =>
+  const searchResults = allProducts.filter((product) =>
     product.title.toLowerCase().includes(query.toLowerCase()),
   );
 
