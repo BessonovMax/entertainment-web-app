@@ -12,6 +12,8 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
     product.title.toLowerCase().includes(query.toLowerCase()),
   );
 
+  const isBookmarkList = true;
+
   // 3. Разделяем результаты на категории, как вы и делали.
   const bookmarkedMovies = searchResults.filter(
     (product) => product.category === "Movie",
@@ -31,7 +33,10 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
           </h2>
           {/* Display all results in one list when searching */}
           <div className="mt-6">
-            <RegularProductList initialProducts={searchResults} />
+            <RegularProductList
+              isBookmarkList={isBookmarkList}
+              initialProducts={searchResults}
+            />
           </div>
         </div>
       ) : (
@@ -43,7 +48,10 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
             {bookmarkedMovies.length === 0 ? (
               <p>No bookmarked Movies found.</p>
             ) : (
-              <RegularProductList initialProducts={bookmarkedMovies} />
+              <RegularProductList
+                isBookmarkList={isBookmarkList}
+                initialProducts={bookmarkedMovies}
+              />
             )}
           </div>
           {/* <!-- Display bookmarked movies --> */}
@@ -54,7 +62,10 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
             {bookmarkedTVSeries.length === 0 ? (
               <p>No bookmarked TV series found.</p>
             ) : (
-              <RegularProductList initialProducts={bookmarkedTVSeries} />
+              <RegularProductList
+                isBookmarkList={isBookmarkList}
+                initialProducts={bookmarkedTVSeries}
+              />
             )}
           </div>
           {/* <!-- Display bookmarked TV series --> */}

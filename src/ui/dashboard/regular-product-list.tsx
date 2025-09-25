@@ -10,12 +10,14 @@ type Props = {
   initialProducts: ProductListType;
   media_type?: "movie" | "tv" | "multi";
   totalPages?: number;
+  isBookmarkList?: boolean;
 };
 
 export default function RegularProductList({
   initialProducts,
   media_type = "multi",
   totalPages = 10,
+  isBookmarkList,
 }: Props) {
   const [products, setProducts] = useState<ProductListType>(initialProducts);
   const [page, setPage] = useState(2); // The next page to fetch is page 2
@@ -70,8 +72,8 @@ export default function RegularProductList({
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-      <div className="mt-8 flex justify-center">
-        {page <= totalPages && ( // Only show the button for up to 10 pages
+      {page <= totalPages && !isBookmarkList && (
+        <div className="mt-8 flex justify-center">
           <button
             onClick={loadMoreProducts}
             disabled={isLoading}
@@ -79,8 +81,8 @@ export default function RegularProductList({
           >
             {isLoading ? "Loading..." : "Load More"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }
