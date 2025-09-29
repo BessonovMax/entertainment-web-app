@@ -190,7 +190,7 @@ export async function searchMedia(
   const encodedQuery = encodeURIComponent(query);
 
   const data = await fetchFromTMDB(
-    `search/${media_variant}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
+    `search/${media_variant}?query=${encodedQuery}&page=${page}&language=en-US`,
   );
 
   if (!data.results) {

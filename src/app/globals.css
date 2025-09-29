@@ -28,6 +28,15 @@
   --bookmarked-background: rgba(16, 20, 30, 0.5);
 }
 
+@keyframes shimmer {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(200%);
+  }
+}
+
 /* --- The Fading Scrollbar Trick --- */
 
 @layer utilities {
