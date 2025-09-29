@@ -2,7 +2,6 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Tooltip } from "antd";
 
 import HomeIcon from "@/ui/dashboard/icons/menuIcons/HomeIcon";
 import MoviesIcon from "@/ui/dashboard/icons/menuIcons/MoviesIcon";

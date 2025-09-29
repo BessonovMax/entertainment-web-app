@@ -11,7 +11,7 @@ type Props = {
   media_variant?: "movie" | "tv" | "multi";
   totalPages?: number;
   isBookmarkList?: boolean;
-  bookmarkedIds: Set<number>;
+  bookmarkedIds?: Set<number>;
 };
 
 export default function RegularProductList({
@@ -19,7 +19,7 @@ export default function RegularProductList({
   media_variant = "multi",
   totalPages = 10,
   isBookmarkList,
-  bookmarkedIds,
+  bookmarkedIds = new Set(),
 }: Props) {
   const [products, setProducts] = useState<ProductListType>(initialProducts);
   const [page, setPage] = useState(2); // The next page to fetch is page 2
