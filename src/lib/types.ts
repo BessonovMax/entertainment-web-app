@@ -12,7 +12,7 @@ export type ProductCardType = {
       large: string;
     };
   };
-  year: number | string;
+  year: string;
   category: string;
   rating: string;
   isBookmarked: boolean;

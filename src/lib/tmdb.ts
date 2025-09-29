@@ -79,8 +79,9 @@ function mapTmdbToProductCard(
 
   // Определяем год, название и категорию в зависимости от типа медиа
   const year =
-    new Date(item.release_date || item.first_air_date || "").getFullYear() ||
-    2024;
+    new Date(item.release_date || item.first_air_date || "")
+      .getFullYear()
+      .toString() || "2024";
   const title = item.title || item.name || "Unknown Title";
 
   return {

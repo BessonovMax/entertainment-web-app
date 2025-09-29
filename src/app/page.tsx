@@ -1,21 +1,8 @@
 /* app/page */
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
 import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";
-import { createClient } from "@/lib/supabase/server";
 
 export default async function Page() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login"); // Если пользователя нет, перенаправляем
-  }
-
   return (
     <div className="flex min-h-dvh flex-col items-center px-6 py-12 md:py-[12rem]">
       <AuthCardWrapper>
@@ -31,7 +18,15 @@ export default async function Page() {
                 className="text-foreground text-nowrap"
               >
                 {" "}
-                Entertainment App
+                Entertainment Web App
+              </Link>{" "}
+              enhanced with a{" "}
+              <Link
+                className="text-nowrap"
+                target="_blank"
+                href={"https://developer.themoviedb.org/"}
+              >
+                TMDB API
               </Link>
               !
             </h1>
