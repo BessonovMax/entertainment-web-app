@@ -4,7 +4,6 @@ import {
   SupabaseBookmarkRecord,
   User,
 } from "@/lib/types";
-import { createClient } from "./server";
 
 const TMDB_IMAGE_BASE_URL =
   process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p/";
@@ -29,21 +28,16 @@ function mapMediaRecordToProductCard(item: MediaRecord): ProductCardType {
     category: category,
     media_type: item.media_type as "movie" | "tv" | "person",
     rating: item.adult ? "18+" : "PG", // Упрощенное определение рейтинга
-    isBookmarked: false, // TMDB не знает о ваших закладках. Это будет false по умолчанию.
+    isBookmarked: true,
     isTrending: false, // Мы будем устанавливать этот флаг в зависимости от эндпоинта
   };
 }
 
-export async function getUserBookmarkedMedia(): Promise<ProductCardType[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return [];
-  }
-
+export async function getUserBookmarkedMedia(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  user: User,
+): Promise<ProductCardType[]> {
   const { data: records, error } = await supabase
     .from("bookmarks")
     .select(
@@ -72,11 +66,11 @@ export async function getUserBookmarkedMedia(): Promise<ProductCardType[]> {
     .map((record) => mapMediaRecordToProductCard(record.media));
 }
 
-export async function getUserBookmarkedIds(user: User): Promise<Set<number>> {
-  const supabase = await createClient();
-
-  if (!user) return new Set();
-
+export async function getUserBookmarkedIds(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  user: User,
+): Promise<Set<number>> {
   const { data: bookmarks, error } = await supabase
     .from("bookmarks")
     .select("media_id")
@@ -86,5 +80,5 @@ export async function getUserBookmarkedIds(user: User): Promise<Set<number>> {
     console.error("Error fetching bookmarked IDs:", error);
     return new Set();
   }
-  return new Set(bookmarks?.map((b) => b.media_id) || []);
+  return new Set(bookmarks?.map((b: { media_id: number }) => b.media_id) || []);
 }

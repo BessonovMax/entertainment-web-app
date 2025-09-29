@@ -30,7 +30,7 @@ export default async function CategoryPage({ query, media_variant }: Props) {
     multi: { placeholder: "", title: "" },
   };
 
-  const bookmarkedIds = await getUserBookmarkedIds(user);
+  const bookmarkedIds = await getUserBookmarkedIds(supabase, user);
 
   const response = await searchMedia(query, 1, media_variant, bookmarkedIds);
   const searchedProducts = response.results;

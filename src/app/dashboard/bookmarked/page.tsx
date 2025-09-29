@@ -19,7 +19,7 @@ export default async function Page(props: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const bookmarkedMedia = await getUserBookmarkedMedia();
+  const bookmarkedMedia = await getUserBookmarkedMedia(supabase, user);
 
   const bookmarkedWithUser = bookmarkedMedia.map((p) => ({
     ...p,

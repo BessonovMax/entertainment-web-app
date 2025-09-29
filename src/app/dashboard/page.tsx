@@ -23,7 +23,7 @@ export default async function Page(props: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const bookmarkedIds = await getUserBookmarkedIds(user);
+  const bookmarkedIds = await getUserBookmarkedIds(supabase, user);
 
   const media_variant = "multi";
 
