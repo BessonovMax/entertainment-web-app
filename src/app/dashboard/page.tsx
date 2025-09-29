@@ -1,3 +1,4 @@
+/* app/dashboard/page */
 import RegularProductList from "@/ui/dashboard/regular-product-list";
 import TrendingProductList from "@/ui/dashboard/trending-product-list";
 
@@ -6,6 +7,7 @@ import { getPopularMedia, getTrendingMedia, searchMedia } from "@/lib/tmdb";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ProductCardType } from "@/lib/types";
+import { getUserBookmarkedIds } from "@/lib/supabase/data";
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -21,16 +23,18 @@ export default async function Page(props: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const media_type = "multi";
+  const bookmarkedIds = await getUserBookmarkedIds(user);
 
-  const response = await searchMedia(query, 1, media_type);
+  const media_variant = "multi";
+
+  const response = await searchMedia(query, 1, media_variant, bookmarkedIds);
   const searchedProducts = response.results;
   const totalPages = response.totalPages;
   const totalResults = response.totalResults;
 
   const [trendingProducts, regularProducts] = await Promise.all([
-    getTrendingMedia(),
-    getPopularMedia(1, media_type), // Используем популярные фильмы как "рекомендованные"
+    getTrendingMedia(bookmarkedIds),
+    getPopularMedia(1, media_variant, bookmarkedIds),
   ]);
 
   const addUserId = (p: ProductCardType) => ({ ...p, userId: user.id });
@@ -53,8 +57,9 @@ export default async function Page(props: {
             <div className="mt-6">
               <RegularProductList
                 totalPages={totalPages}
-                media_type={media_type}
+                media_variant={media_variant}
                 initialProducts={searchedProducts}
+                bookmarkedIds={bookmarkedIds}
               />
             </div>
           </div>
@@ -71,8 +76,9 @@ export default async function Page(props: {
                 Popular
               </h2>
               <RegularProductList
-                media_type={media_type}
+                media_variant={media_variant}
                 initialProducts={regularWithUser}
+                bookmarkedIds={bookmarkedIds}
               />
             </div>
           </>

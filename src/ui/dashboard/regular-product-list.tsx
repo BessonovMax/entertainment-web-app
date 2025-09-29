@@ -8,16 +8,18 @@ import { useCallback, useState } from "react";
 
 type Props = {
   initialProducts: ProductListType;
-  media_type?: "movie" | "tv" | "multi";
+  media_variant?: "movie" | "tv" | "multi";
   totalPages?: number;
   isBookmarkList?: boolean;
+  bookmarkedIds: Set<number>;
 };
 
 export default function RegularProductList({
   initialProducts,
-  media_type = "multi",
+  media_variant = "multi",
   totalPages = 10,
   isBookmarkList,
+  bookmarkedIds,
 }: Props) {
   const [products, setProducts] = useState<ProductListType>(initialProducts);
   const [page, setPage] = useState(2); // The next page to fetch is page 2
@@ -35,14 +37,23 @@ export default function RegularProductList({
   const loadMoreProducts = useCallback(async () => {
     setIsLoading(true);
     // Determine which fetch function to call on Load More based on mediaType
-    let moreProducts: ProductListType = await fetchMoreMedia(page, media_type);
+    let moreProducts: ProductListType = await fetchMoreMedia(
+      page,
+      media_variant,
+      bookmarkedIds,
+    );
 
     if (query) {
       // If there's a search query, fetch more search results
-      const response = await searchMoreMedia(query, page, media_type);
+      const response = await searchMoreMedia(
+        query,
+        page,
+        media_variant,
+        bookmarkedIds,
+      );
       moreProducts = response.results;
     }
-
+    // media products from tmdb api come doubled sometime, so there is a need to check products for this case
     if (moreProducts.length > 0) {
       const uniqueNewProducts: ProductListType = [];
       const newDisplayedIds = new Set(displayedProductIds);

@@ -1,3 +1,5 @@
+/* app/dashboard/tv-series/page */
+import { getUserBookmarkedIds } from "@/lib/supabase/data";
 import { createClient } from "@/lib/supabase/server";
 import { getPopularMedia, searchMedia } from "@/lib/tmdb";
 import { ProductCardType } from "@/lib/types";
@@ -12,7 +14,7 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.search || "";
-  const media_type = "tv";
+  const media_variant = "tv";
 
   const supabase = await createClient();
   const {
@@ -20,13 +22,15 @@ export default async function Page(props: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const response = await searchMedia(query, 1, media_type);
+  const bookmarkedIds = await getUserBookmarkedIds(user);
+
+  const response = await searchMedia(query, 1, media_variant, bookmarkedIds);
   const searchedProducts = response.results;
   const totalPages = response.totalPages;
   const totalResults = response.totalResults;
 
   const addUserId = (p: ProductCardType) => ({ ...p, userId: user.id });
-  const series = await getPopularMedia(1, media_type);
+  const series = await getPopularMedia(1, media_variant, bookmarkedIds);
   const seriesWithUser = series.map(addUserId);
 
   return (
@@ -44,8 +48,9 @@ export default async function Page(props: {
           <div className="mt-6">
             <RegularProductList
               totalPages={totalPages}
-              media_type={media_type}
+              media_variant={media_variant}
               initialProducts={searchedProducts}
+              bookmarkedIds={bookmarkedIds}
             />
           </div>
         </div>
@@ -58,8 +63,9 @@ export default async function Page(props: {
             </h2>
             {/* <!-- Display recommended shows --> */}
             <RegularProductList
-              media_type={media_type}
+              media_variant={media_variant}
               initialProducts={seriesWithUser}
+              bookmarkedIds={bookmarkedIds}
             />
           </div>
         </>

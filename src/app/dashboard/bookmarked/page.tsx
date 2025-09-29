@@ -1,3 +1,4 @@
+/* app/dashboard/bookmarked/page */
 import { getUserBookmarkedMedia } from "@/lib/supabase/data";
 import { createClient } from "@/lib/supabase/server";
 import BookmarkedContent from "@/ui/dashboard/bookmarked/bookmarked-content";

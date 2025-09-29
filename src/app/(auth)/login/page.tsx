@@ -1,3 +1,4 @@
+/* app/(auth)/login/page */
 "use client";
 import { createClient } from "@/lib/supabase/client";
 import AuthCardWrapper from "@/ui/auth/auth-card-wrapper";

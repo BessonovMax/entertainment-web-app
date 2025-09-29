@@ -2,6 +2,7 @@ import {
   MediaRecord,
   ProductCardType,
   SupabaseBookmarkRecord,
+  User,
 } from "@/lib/types";
 import { createClient } from "./server";
 
@@ -69,4 +70,21 @@ export async function getUserBookmarkedMedia(): Promise<ProductCardType[]> {
   return typedRecords
     .filter((record) => record.media !== null)
     .map((record) => mapMediaRecordToProductCard(record.media));
+}
+
+export async function getUserBookmarkedIds(user: User): Promise<Set<number>> {
+  const supabase = await createClient();
+
+  if (!user) return new Set();
+
+  const { data: bookmarks, error } = await supabase
+    .from("bookmarks")
+    .select("media_id")
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error fetching bookmarked IDs:", error);
+    return new Set();
+  }
+  return new Set(bookmarks?.map((b) => b.media_id) || []);
 }

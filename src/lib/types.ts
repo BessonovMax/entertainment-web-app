@@ -58,3 +58,7 @@ export type PaginatedResponse = {
 };
 
 export type MediaType = "movie" | "tv" | "person";
+
+export interface User {
+  id: string;
+}

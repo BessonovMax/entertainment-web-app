@@ -36,19 +36,18 @@ export default function NavLinks() {
       {links.map((link) => {
         const LinkIcon = link.icon;
         return (
-          <Tooltip key={link.name} title={link.name} placement="bottomLeft">
-            <Link
-              href={link.href}
-              className={clsx(
-                "text-nav-item hover:text-foreground flex items-center justify-center",
-                {
-                  "text-white": pathname === link.href,
-                },
-              )}
-            >
-              <LinkIcon className="size-4 md:size-5" />
-            </Link>
-          </Tooltip>
+          <Link
+            key={link.name}
+            href={link.href}
+            className={clsx(
+              "text-nav-item hover:text-foreground flex items-center justify-center",
+              {
+                "text-white": pathname === link.href,
+              },
+            )}
+          >
+            <LinkIcon className="size-4 md:size-5" />
+          </Link>
         );
       })}
     </div>

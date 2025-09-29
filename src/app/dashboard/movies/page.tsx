@@ -1,3 +1,5 @@
+/* app/dashboard/movies/page */
+import { getUserBookmarkedIds } from "@/lib/supabase/data";
 import { createClient } from "@/lib/supabase/server";
 import { getPopularMedia, searchMedia } from "@/lib/tmdb";
 import { ProductCardType } from "@/lib/types";
@@ -12,7 +14,7 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.search || "";
-  const media_type = "movie";
+  const media_variant = "movie";
 
   const supabase = await createClient();
   const {
@@ -20,7 +22,9 @@ export default async function Page(props: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const response = await searchMedia(query, 1, media_type);
+  const bookmarkedIds = await getUserBookmarkedIds(user);
+
+  const response = await searchMedia(query, 1, media_variant, bookmarkedIds);
   const searchedProducts = response.results;
   const totalSearchPages = response.totalPages;
   const totalSearchResults = response.totalResults;
@@ -28,7 +32,7 @@ export default async function Page(props: {
   // Perform the search once on the server
 
   const addUserId = (p: ProductCardType) => ({ ...p, userId: user.id });
-  const movies = await getPopularMedia(1, media_type);
+  const movies = await getPopularMedia(1, media_variant, bookmarkedIds);
   const moviesWithUser = movies.map(addUserId);
 
   return (
@@ -45,8 +49,9 @@ export default async function Page(props: {
           <div className="mt-6">
             <RegularProductList
               totalPages={totalSearchPages}
-              media_type="movie"
+              media_variant={media_variant}
               initialProducts={searchedProducts}
+              bookmarkedIds={bookmarkedIds}
             />
           </div>
         </div>
@@ -59,8 +64,9 @@ export default async function Page(props: {
             </h2>
             {/* <!-- Display recommended shows --> */}
             <RegularProductList
-              media_type="movie"
+              media_variant={media_variant}
               initialProducts={moviesWithUser}
+              bookmarkedIds={bookmarkedIds}
             />
           </div>
         </>

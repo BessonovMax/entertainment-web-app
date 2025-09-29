@@ -14,18 +14,25 @@ const TMDB_IMAGE_BASE_URL =
  */
 export async function fetchMoreMedia(
   page: number,
-  media_type: "movie" | "tv" | "multi",
+  media_variant: "movie" | "tv" | "multi",
+  bookmarkedIds: Set<number>,
 ) {
-  const moreMedia = await getPopularMedia(page, media_type);
+  const moreMedia = await getPopularMedia(page, media_variant, bookmarkedIds);
   return moreMedia;
 }
 
 export async function searchMoreMedia(
   query: string,
   page: number,
-  media_type: "movie" | "tv" | "multi",
+  media_variant: "movie" | "tv" | "multi",
+  bookmarkedIds: Set<number>,
 ) {
-  const moreSearchResults = await searchMedia(query, page, media_type);
+  const moreSearchResults = await searchMedia(
+    query,
+    page,
+    media_variant,
+    bookmarkedIds,
+  );
   return moreSearchResults;
 }
 

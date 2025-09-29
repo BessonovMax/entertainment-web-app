@@ -7,7 +7,6 @@ import type {
   PaginatedResponse,
   MediaType,
 } from "@/lib/types";
-import { createClient } from "./supabase/server";
 
 // Константы для удобства
 const TMDB_API_TOKEN = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -138,30 +137,10 @@ async function fetchFromTMDB(endpoint: string): Promise<{
   }
 }
 
-async function getUserBookmarkedIds(): Promise<Set<number>> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new Set();
-
-  const { data: bookmarks, error } = await supabase
-    .from("bookmarks")
-    .select("media_id")
-    .eq("user_id", user.id);
-
-  if (error) {
-    console.error("Error fetching bookmarked IDs:", error);
-    return new Set();
-  }
-  return new Set(bookmarks?.map((b) => b.media_id) || []);
-}
-
-export async function getTrendingMedia(): Promise<ProductListType> {
-  const [data, bookmarkedIds] = await Promise.all([
-    fetchFromTMDB("trending/all/week"),
-    getUserBookmarkedIds(),
-  ]);
+export async function getTrendingMedia(
+  bookmarkedIds: Set<number>,
+): Promise<ProductListType> {
+  const data = await fetchFromTMDB("trending/all/week");
   const mappedData = data.results.map((item) =>
     mapTmdbToProductCard(item, bookmarkedIds),
   );
@@ -172,36 +151,30 @@ export async function getTrendingMedia(): Promise<ProductListType> {
 
 export async function getPopularMedia(
   page: number = 1,
-  media_type: "movie" | "tv" | "multi" = "multi",
+  media_variant: "movie" | "tv" | "multi" = "multi",
+  bookmarkedIds: Set<number>,
 ): Promise<ProductListType> {
-  if (media_type === "multi") {
-    const [resultMovies, resultTvShows, bookmarkedIds] = await Promise.all([
+  if (media_variant === "multi") {
+    const [popularMovies, popularTvShows] = await Promise.all([
       fetchFromTMDB(`movie/popular?language=en-US&page=${page}`),
       fetchFromTMDB(`tv/popular?language=en-US&page=${page}`),
-      getUserBookmarkedIds(),
     ]);
 
-    const popularMovies = resultMovies.results.map((item) =>
-      mapTmdbToProductCard(item, bookmarkedIds),
-    );
-    const popularTvShows = resultTvShows.results.map((item) =>
-      mapTmdbToProductCard(item, bookmarkedIds),
-    );
-
-    const combinedMedia = [...popularMovies, ...popularTvShows];
+    const combinedMedia = [...popularMovies.results, ...popularTvShows.results];
     const seed = `${new Date().toISOString().slice(0, 10)}-page-${page}`;
 
     const shuffledMedia = seededShuffle(combinedMedia, seed);
 
-    return shuffledMedia;
-  } else if (media_type === "movie" || media_type === "tv") {
-    const [data, bookmarkedIds] = await Promise.all([
-      fetchFromTMDB(`${media_type}/popular?language=en-US&page=${page}`),
-      getUserBookmarkedIds(),
-    ]);
+    return shuffledMedia.map((item) =>
+      mapTmdbToProductCard(item, bookmarkedIds),
+    );
+  } else if (media_variant === "movie" || media_variant === "tv") {
+    const data = await fetchFromTMDB(
+      `${media_variant}/popular?language=en-US&page=${page}`,
+    );
 
     return data.results.map((item) =>
-      mapTmdbToProductCard(item, bookmarkedIds, media_type),
+      mapTmdbToProductCard(item, bookmarkedIds, media_variant),
     );
   }
   return [];
@@ -210,16 +183,14 @@ export async function getPopularMedia(
 export async function searchMedia(
   query: string,
   page: number = 1,
-  media_type: "movie" | "tv" | "multi",
+  media_variant: "movie" | "tv" | "multi",
+  bookmarkedIds: Set<number>,
 ): Promise<PaginatedResponse> {
   const encodedQuery = encodeURIComponent(query);
 
-  const [data, bookmarkedIds] = await Promise.all([
-    fetchFromTMDB(
-      `search/${media_type}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
-    ),
-    getUserBookmarkedIds(),
-  ]);
+  const data = await fetchFromTMDB(
+    `search/${media_variant}?query=${encodedQuery}&page=${page}&language=en-US&include_adult=false`,
+  );
 
   if (!data.results) {
     return { page: 1, results: [], totalPages: 0, totalResults: 0 };
@@ -227,7 +198,7 @@ export async function searchMedia(
 
   let finalResults = data.results;
 
-  if (media_type === "multi") {
+  if (media_variant === "multi") {
     finalResults = data.results.filter(
       (item: TmdbResult) =>
         item.media_type === "movie" || item.media_type === "tv",
