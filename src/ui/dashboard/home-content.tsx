@@ -9,10 +9,12 @@ import { getUserBookmarkedIds } from "@/lib/supabase/data";
 import { unstable_cache } from "next/cache";
 
 type Props = {
-  query: string;
+  searchParams: Promise<{ search: string }>;
 };
 
-export default async function HomeContent({ query }: Props) {
+export default async function HomeContent({ searchParams }: Props) {
+  const query = (await searchParams).search || "";
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -66,6 +68,7 @@ export default async function HomeContent({ query }: Props) {
           media_variant={media_variant}
           initialProducts={searchedProducts}
           bookmarkedIds={bookmarkedIds}
+          searchParams={searchParams}
         />
       </div>
     </div>
@@ -85,6 +88,7 @@ export default async function HomeContent({ query }: Props) {
           media_variant={media_variant}
           initialProducts={regularWithUser}
           bookmarkedIds={bookmarkedIds}
+          searchParams={searchParams}
         />
       </div>
     </>

@@ -66,6 +66,7 @@ export default async function CategoryPageContent({
           media_variant={media_variant}
           initialProducts={searchedProducts}
           bookmarkedIds={bookmarkedIds}
+          searchParams={searchParams}
         />
       </div>
     </div>
@@ -81,6 +82,7 @@ export default async function CategoryPageContent({
           media_variant={media_variant}
           initialProducts={moviesWithUser}
           bookmarkedIds={bookmarkedIds}
+          searchParams={searchParams}
         />
       </div>
     </>
