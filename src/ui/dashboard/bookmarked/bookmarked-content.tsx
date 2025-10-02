@@ -41,7 +41,7 @@ export default async function BookmarkedContent({
             <RegularProductList
               isBookmarkList={isBookmarkList}
               initialProducts={searchResults}
-              searchParams={searchParams}
+              query={query}
             />
           </div>
         </div>
@@ -57,7 +57,7 @@ export default async function BookmarkedContent({
               <RegularProductList
                 isBookmarkList={isBookmarkList}
                 initialProducts={bookmarkedMovies}
-                searchParams={searchParams}
+                query={query}
               />
             )}
           </div>
@@ -72,7 +72,7 @@ export default async function BookmarkedContent({
               <RegularProductList
                 isBookmarkList={isBookmarkList}
                 initialProducts={bookmarkedTVSeries}
-                searchParams={searchParams}
+                query={query}
               />
             )}
           </div>

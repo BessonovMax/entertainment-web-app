@@ -68,7 +68,7 @@ export default async function HomeContent({ searchParams }: Props) {
           media_variant={media_variant}
           initialProducts={searchedProducts}
           bookmarkedIds={bookmarkedIds}
-          searchParams={searchParams}
+          query={query}
         />
       </div>
     </div>
@@ -88,7 +88,7 @@ export default async function HomeContent({ searchParams }: Props) {
           media_variant={media_variant}
           initialProducts={regularWithUser}
           bookmarkedIds={bookmarkedIds}
-          searchParams={searchParams}
+          query={query}
         />
       </div>
     </>

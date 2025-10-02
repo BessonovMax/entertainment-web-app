@@ -3,7 +3,7 @@
 import { fetchMoreMedia, searchMoreMedia } from "@/app/actions";
 import { type ProductListType } from "@/lib/types";
 import ProductCard from "@/ui/dashboard/product-card";
-import { use, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 type Props = {
   initialProducts: ProductListType;
@@ -11,7 +11,7 @@ type Props = {
   totalPages?: number;
   isBookmarkList?: boolean;
   bookmarkedIds?: Set<number>;
-  searchParams: Promise<{ search: string }>;
+  query: string;
 };
 
 export default function RegularProductList({
@@ -20,7 +20,7 @@ export default function RegularProductList({
   totalPages = 10,
   isBookmarkList,
   bookmarkedIds = new Set(),
-  searchParams,
+  query,
 }: Props) {
   const [products, setProducts] = useState<ProductListType>(initialProducts);
   const [page, setPage] = useState(2); // The next page to fetch is page 2
@@ -29,10 +29,6 @@ export default function RegularProductList({
   const [displayedProductIds, setDisplayedProductIds] = useState(
     new Set(initialProducts.map((p) => p.id)),
   );
-
-  const params = use(searchParams);
-
-  const query = params.search;
 
   // To avoid duplicates when loading more products
   const loadMoreProducts = useCallback(async () => {
