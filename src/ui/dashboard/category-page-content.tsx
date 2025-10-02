@@ -3,26 +3,43 @@ import { createClient } from "@/lib/supabase/server";
 import { getPopularMedia, searchMedia } from "@/lib/tmdb";
 import { ProductCardType } from "@/lib/types";
 import RegularProductList from "@/ui/dashboard/regular-product-list";
+import { unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 
 type Props = {
-  query: string;
+  searchParams: Promise<{ search: string }>;
   media_variant: "movie" | "tv" | "multi";
   title: string;
 };
 
 export default async function CategoryPageContent({
-  query,
+  searchParams,
   media_variant,
   title,
 }: Props) {
+  const query = (await searchParams).search || "";
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const bookmarkedIds = await getUserBookmarkedIds(supabase, user);
+  const getCachedBookmarkedIds = unstable_cache(
+    async () => {
+      return getUserBookmarkedIds(supabase, user);
+    },
+    ["user-bookmarks", user.id], // Cache key: unique string + user ID
+    {
+      tags: [`bookmarks:${user.id}`], // Tags for on-demand revalidation
+      revalidate: 60, // Optional: Revalidate every 60 seconds
+    },
+  );
+
+  const bookmarkedIdsFromCache = await getCachedBookmarkedIds();
+
+  // THE FIX: We must convert the Array returned by the cache back into a Set.
+  const bookmarkedIds = new Set(bookmarkedIdsFromCache);
 
   const response = await searchMedia(query, 1, media_variant, bookmarkedIds);
   const searchedProducts = response.results;

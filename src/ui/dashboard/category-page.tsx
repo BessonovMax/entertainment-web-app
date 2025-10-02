@@ -4,11 +4,14 @@ import { Suspense } from "react";
 import { CategoryPageContentSkeleton } from "./skeletons";
 
 type Props = {
-  query: string;
   media_variant: "movie" | "tv" | "multi";
+  searchParams: Promise<{ search: string }>;
 };
 
-export default async function CategoryPage({ query, media_variant }: Props) {
+export default async function CategoryPage({
+  searchParams,
+  media_variant,
+}: Props) {
   const categotyData = {
     movie: {
       placeholder: "Search for movies",
@@ -26,7 +29,7 @@ export default async function CategoryPage({ query, media_variant }: Props) {
       <SearchInput placeholder={categotyData[media_variant].placeholder} />
       <Suspense fallback={<CategoryPageContentSkeleton />}>
         <CategoryPageContent
-          query={query}
+          searchParams={searchParams}
           media_variant={media_variant}
           title={categotyData[media_variant].title}
         />

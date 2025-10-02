@@ -70,7 +70,7 @@ export async function getUserBookmarkedIds(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   user: User,
-): Promise<Set<number>> {
+): Promise<Array<number>> {
   const { data: bookmarks, error } = await supabase
     .from("bookmarks")
     .select("media_id")
@@ -78,7 +78,7 @@ export async function getUserBookmarkedIds(
 
   if (error) {
     console.error("Error fetching bookmarked IDs:", error);
-    return new Set();
+    return [];
   }
-  return new Set(bookmarks?.map((b: { media_id: number }) => b.media_id) || []);
+  return bookmarks?.map((b: { media_id: number }) => b.media_id) || [];
 }

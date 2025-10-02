@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ProductCardType } from "@/lib/types";
 import { getUserBookmarkedIds } from "@/lib/supabase/data";
-import { TrendingCardSkeleton } from "./skeletons";
+import { unstable_cache } from "next/cache";
 
 type Props = {
   query: string;
@@ -19,7 +19,21 @@ export default async function HomeContent({ query }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const bookmarkedIds = await getUserBookmarkedIds(supabase, user);
+  const getCachedBookmarkedIds = unstable_cache(
+    async () => {
+      return getUserBookmarkedIds(supabase, user);
+    },
+    ["user-bookmarks", user.id], // Cache key: unique string + user ID
+    {
+      tags: [`bookmarks:${user.id}`], // Tags for on-demand revalidation
+      revalidate: 60, // Optional: Revalidate every 60 seconds
+    },
+  );
+
+  const bookmarkedIdsFromCache = await getCachedBookmarkedIds();
+
+  // THE FIX: We must convert the Array returned by the cache back into a Set.
+  const bookmarkedIds = new Set(bookmarkedIdsFromCache);
 
   const media_variant = "multi";
 

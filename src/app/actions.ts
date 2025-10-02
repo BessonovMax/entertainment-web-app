@@ -3,6 +3,7 @@
 import { getPopularMedia, searchMedia } from "@/lib/tmdb";
 import { createClient } from "@/lib/supabase/server";
 import { type ProductCardType } from "@/lib/types";
+import { revalidateTag } from "next/cache";
 
 const TMDB_IMAGE_BASE_URL =
   process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p/";
@@ -77,6 +78,7 @@ export async function addBookmark(
   const { error } = await supabase
     .from("bookmarks")
     .insert({ user_id: userId, media_id: mediaId, media_type: mediaType });
+  revalidateTag(`bookmarks:${userId}`);
   if (error) console.error("Error adding bookmark:", error.message);
 }
 
@@ -89,5 +91,6 @@ export async function removeBookmark(userId: string, mediaId: number) {
     .from("bookmarks")
     .delete()
     .match({ user_id: userId, media_id: mediaId });
+  revalidateTag(`bookmarks:${userId}`);
   if (error) console.error("Error removing bookmark:", error.message);
 }

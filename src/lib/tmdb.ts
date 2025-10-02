@@ -120,10 +120,11 @@ async function fetchFromTMDB(endpoint: string): Promise<{
       Authorization: `Bearer ${TMDB_API_TOKEN}`,
     },
     // Добавляем кэширование Next.js
+    cache: "force-cache",
     next: {
       revalidate: 60 * 60 * 24, // Кэшировать на 24 часа
     },
-  };
+  } as const;
 
   try {
     const response = await fetch(url, options);
