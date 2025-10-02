@@ -12,8 +12,8 @@ export default async function Page({
   return (
     <>
       <div className="flex flex-col gap-6 md:gap-10">
-        <SearchInput placeholder="Search for movies or TV series" />
         <Suspense fallback={<HomePageContentSkeleton />}>
+          <SearchInput placeholder="Search for movies or TV series" />
           <HomeContent searchParams={searchParams} />
         </Suspense>
       </div>

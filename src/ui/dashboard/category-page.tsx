@@ -26,8 +26,8 @@ export default async function CategoryPage({
 
   return (
     <div className="flex flex-col gap-6 md:gap-10">
-      <SearchInput placeholder={categotyData[media_variant].placeholder} />
       <Suspense fallback={<CategoryPageContentSkeleton />}>
+        <SearchInput placeholder={categotyData[media_variant].placeholder} />
         <CategoryPageContent
           searchParams={searchParams}
           media_variant={media_variant}

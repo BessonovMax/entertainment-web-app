@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import BookmarkedContent from "@/ui/dashboard/bookmarked/bookmarked-content";
 import SearchInput from "@/ui/dashboard/search-input";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Page({
   searchParams,
@@ -26,11 +27,13 @@ export default async function Page({
 
   return (
     <div className="flex flex-col gap-6 md:gap-10">
-      <SearchInput placeholder="Search for bookmarked shows" />
-      <BookmarkedContent
-        allProducts={bookmarkedWithUser}
-        searchParams={searchParams}
-      />
+      <Suspense>
+        <SearchInput placeholder="Search for bookmarked shows" />
+        <BookmarkedContent
+          allProducts={bookmarkedWithUser}
+          searchParams={searchParams}
+        />
+      </Suspense>
     </div>
   );
 }
