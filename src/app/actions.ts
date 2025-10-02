@@ -79,6 +79,7 @@ export async function addBookmark(
     .from("bookmarks")
     .insert({ user_id: userId, media_id: mediaId, media_type: mediaType });
   revalidateTag(`bookmarks:${userId}`);
+  revalidateTag(`bookmarks-media:${userId}`);
   if (error) console.error("Error adding bookmark:", error.message);
 }
 
@@ -92,5 +93,6 @@ export async function removeBookmark(userId: string, mediaId: number) {
     .delete()
     .match({ user_id: userId, media_id: mediaId });
   revalidateTag(`bookmarks:${userId}`);
+  revalidateTag(`bookmarks-media:${userId}`);
   if (error) console.error("Error removing bookmark:", error.message);
 }

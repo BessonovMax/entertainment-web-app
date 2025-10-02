@@ -1,19 +1,43 @@
-import { ProductCardType } from "@/lib/types";
 import RegularProductList from "@/ui/dashboard/regular-product-list";
+import { getUserBookmarkedMedia } from "@/lib/supabase/data";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 
 type Props = {
-  allProducts: ProductCardType[]; // Принимает ВЕСЬ список продуктов
   searchParams: Promise<{ search: string }>;
 };
 
-export default async function BookmarkedContent({
-  allProducts,
-  searchParams,
-}: Props) {
+export default async function BookmarkedContent({ searchParams }: Props) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const getCachedBookmarkedIds = unstable_cache(
+    async () => {
+      return getUserBookmarkedMedia(supabase, user);
+    },
+    ["user-bookmarks-media", user.id], // Cache key: unique string + user ID
+    {
+      tags: [`bookmarks-media:${user.id}`], // Tags for on-demand revalidation
+      revalidate: 60, // Optional: Revalidate every 60 seconds
+    },
+  );
+
+  const bookmarkedMedia = await getCachedBookmarkedIds();
+
+  const bookmarkedWithUser = bookmarkedMedia.map((p) => ({
+    ...p,
+    userId: user.id,
+    isBookmarked: true,
+  }));
+
   const query = (await searchParams).search || "";
 
   // 2. Применяем поисковую фильтрацию к уже отфильтрованному списку закладок.
-  const searchResults = allProducts.filter((product) =>
+  const searchResults = bookmarkedWithUser.filter((product) =>
     product.title.toLowerCase().includes(query.toLowerCase()),
   );
 

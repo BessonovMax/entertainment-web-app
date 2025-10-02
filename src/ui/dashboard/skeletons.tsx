@@ -84,7 +84,9 @@ export function CategoryPageContentSkeleton() {
   return (
     <>
       <div className="flex flex-col gap-6 lg:gap-8">
-        <h2 className="h-[25px] md:h-[40px]"></h2>
+        <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+          Movies
+        </h2>
         {/* <!-- Display recommended shows --> */}
         <RegularProductListSkeleton />
       </div>
@@ -92,17 +94,163 @@ export function CategoryPageContentSkeleton() {
   );
 }
 
+export function MoviePageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 md:gap-10">
+      <div className="flex items-center gap-4 rounded-md md:gap-6 lg:gap-8">
+        <svg
+          className="size-6 self-start md:size-8"
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M27.613 25.72 23.08 21.2a10.56 10.56 0 0 0 2.253-6.533C25.333 8.776 20.558 4 14.667 4S4 8.776 4 14.667c0 5.89 4.776 10.666 10.667 10.666A10.56 10.56 0 0 0 21.2 23.08l4.52 4.533a1.333 1.333 0 0 0 1.893 0 1.333 1.333 0 0 0 0-1.893ZM6.667 14.667a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
+            fill="#fff"
+          />{" "}
+        </svg>
+
+        <input
+          placeholder="Search for movies"
+          className="placeholder-login-card caret-foreground w-full border-b border-transparent pb-2.5 font-light text-white focus:border-gray-500 focus:outline-none md:text-2xl"
+        />
+      </div>
+      <div className="flex flex-col gap-6 lg:gap-8">
+        <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+          Movies
+        </h2>
+        {/* <!-- Display recommended shows --> */}
+        <RegularProductListSkeleton />
+      </div>
+    </div>
+  );
+}
+export function TVPageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 md:gap-10">
+      <div className="flex items-center gap-4 rounded-md md:gap-6 lg:gap-8">
+        <svg
+          className="size-6 self-start md:size-8"
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M27.613 25.72 23.08 21.2a10.56 10.56 0 0 0 2.253-6.533C25.333 8.776 20.558 4 14.667 4S4 8.776 4 14.667c0 5.89 4.776 10.666 10.667 10.666A10.56 10.56 0 0 0 21.2 23.08l4.52 4.533a1.333 1.333 0 0 0 1.893 0 1.333 1.333 0 0 0 0-1.893ZM6.667 14.667a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
+            fill="#fff"
+          />{" "}
+        </svg>
+
+        <input
+          placeholder="Search for TV series"
+          className="placeholder-login-card caret-foreground w-full border-b border-transparent pb-2.5 font-light text-white focus:border-gray-500 focus:outline-none md:text-2xl"
+        />
+      </div>
+      <div className="flex flex-col gap-6 lg:gap-8">
+        <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+          TV Series
+        </h2>
+        {/* <!-- Display recommended shows --> */}
+        <RegularProductListSkeleton />
+      </div>
+    </div>
+  );
+}
+
 export function HomePageContentSkeleton() {
   return (
     <>
       <div className="flex flex-col gap-6 lg:gap-8">
-        <h2 className="h-[25px] md:h-[40px]"></h2>
+        <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+          Trending
+        </h2>
         <TrendingProductListSkeleton />
       </div>
       <div className="flex flex-col gap-6 lg:gap-8">
-        <h2 className="h-[25px] md:h-[40px]"></h2>
+        <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+          Popular
+        </h2>
         <RegularProductListSkeleton />
       </div>
     </>
+  );
+}
+
+export function HomePageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 md:gap-10">
+      <div className="flex items-center gap-4 rounded-md md:gap-6 lg:gap-8">
+        <svg
+          className="size-6 self-start md:size-8"
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M27.613 25.72 23.08 21.2a10.56 10.56 0 0 0 2.253-6.533C25.333 8.776 20.558 4 14.667 4S4 8.776 4 14.667c0 5.89 4.776 10.666 10.667 10.666A10.56 10.56 0 0 0 21.2 23.08l4.52 4.533a1.333 1.333 0 0 0 1.893 0 1.333 1.333 0 0 0 0-1.893ZM6.667 14.667a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
+            fill="#fff"
+          />{" "}
+        </svg>
+
+        <input
+          placeholder="Search for movies or TV series"
+          className="placeholder-login-card caret-foreground w-full border-b border-transparent pb-2.5 font-light text-white focus:border-gray-500 focus:outline-none md:text-2xl"
+        />
+      </div>
+      <HomePageContentSkeleton />
+    </div>
+  );
+}
+
+export function BookmarkPageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 md:gap-10">
+      <div className="flex items-center gap-4 rounded-md md:gap-6 lg:gap-8">
+        <svg
+          className="size-6 self-start md:size-8"
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M27.613 25.72 23.08 21.2a10.56 10.56 0 0 0 2.253-6.533C25.333 8.776 20.558 4 14.667 4S4 8.776 4 14.667c0 5.89 4.776 10.666 10.667 10.666A10.56 10.56 0 0 0 21.2 23.08l4.52 4.533a1.333 1.333 0 0 0 1.893 0 1.333 1.333 0 0 0 0-1.893ZM6.667 14.667a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
+            fill="#fff"
+          />{" "}
+        </svg>
+
+        <input
+          placeholder="Search for bookmarked shows"
+          className="placeholder-login-card caret-foreground w-full border-b border-transparent pb-2.5 font-light text-white focus:border-gray-500 focus:outline-none md:text-2xl"
+        />
+      </div>
+      <>
+        <div className="flex flex-col gap-6 lg:gap-8">
+          <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+            Bookmarked Movies
+          </h2>
+
+          <BookmarkedProductListSkeleton />
+        </div>
+        {/* <!-- Display bookmarked movies --> */}
+        <div className="flex flex-col gap-6 lg:gap-8">
+          <h2 className="text-[1.25rem] leading-[125%] font-light tracking-[-0.3px] md:text-[2rem] md:tracking-[-0.5px]">
+            Bookmarked TV Series
+          </h2>
+
+          <BookmarkedProductListSkeleton />
+        </div>
+        {/* <!-- Display bookmarked TV series --> */}
+      </>
+    </div>
+  );
+}
+
+export function BookmarkedProductListSkeleton() {
+  return (
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(10.25rem,1fr))] gap-x-[15px] gap-y-4 md:grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))] md:gap-x-[30px] md:gap-y-6 lg:grid-cols-[repeat(auto-fill,minmax(17.5rem,1fr))] lg:gap-x-[40px]">
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+      <ProductCardSkeleton />
+    </div>
   );
 }
