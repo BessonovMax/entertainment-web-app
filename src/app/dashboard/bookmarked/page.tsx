@@ -5,14 +5,11 @@ import BookmarkedContent from "@/ui/dashboard/bookmarked/bookmarked-content";
 import SearchInput from "@/ui/dashboard/search-input";
 import { redirect } from "next/navigation";
 
-export default async function Page(props: {
-  searchParams?: Promise<{
-    search?: string;
-  }>;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ search: string }>;
 }) {
-  const searchParams = await props.searchParams;
-  const query = searchParams?.search || "";
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,7 +27,10 @@ export default async function Page(props: {
   return (
     <div className="flex flex-col gap-6 md:gap-10">
       <SearchInput placeholder="Search for bookmarked shows" />
-      <BookmarkedContent allProducts={bookmarkedWithUser} query={query} />
+      <BookmarkedContent
+        allProducts={bookmarkedWithUser}
+        searchParams={searchParams}
+      />
     </div>
   );
 }

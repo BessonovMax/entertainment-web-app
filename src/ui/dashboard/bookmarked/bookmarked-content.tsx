@@ -3,10 +3,15 @@ import RegularProductList from "@/ui/dashboard/regular-product-list";
 
 type Props = {
   allProducts: ProductCardType[]; // Принимает ВЕСЬ список продуктов
-  query: string; // Принимает поисковый запрос
+  searchParams: Promise<{ search: string }>;
 };
 
-export default function BookmarkedContent({ allProducts, query }: Props) {
+export default async function BookmarkedContent({
+  allProducts,
+  searchParams,
+}: Props) {
+  const query = (await searchParams).search || "";
+
   // 2. Применяем поисковую фильтрацию к уже отфильтрованному списку закладок.
   const searchResults = allProducts.filter((product) =>
     product.title.toLowerCase().includes(query.toLowerCase()),
@@ -36,6 +41,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
             <RegularProductList
               isBookmarkList={isBookmarkList}
               initialProducts={searchResults}
+              searchParams={searchParams}
             />
           </div>
         </div>
@@ -51,6 +57,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
               <RegularProductList
                 isBookmarkList={isBookmarkList}
                 initialProducts={bookmarkedMovies}
+                searchParams={searchParams}
               />
             )}
           </div>
@@ -65,6 +72,7 @@ export default function BookmarkedContent({ allProducts, query }: Props) {
               <RegularProductList
                 isBookmarkList={isBookmarkList}
                 initialProducts={bookmarkedTVSeries}
+                searchParams={searchParams}
               />
             )}
           </div>
